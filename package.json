@@ -1,5 +1,5 @@
 {
-  "name": "H0ck Core",
+  "name": "h0ck-core",
   "version": "1.0.0",
   "description": "H0ck Backend core repository",
   "main": "index.js",
