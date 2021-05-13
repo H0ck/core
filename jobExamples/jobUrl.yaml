@@ -1,0 +1,17 @@
+id: "UUID"
+title: "Job 1"
+code: "code"
+parametrization:
+  parameters:
+    - name: "list1"
+      type: "urlList"
+      definition: "https://gist.githubusercontent.com/AlexGue/8600403bdd2b4309980040ffa681a262/raw/dd80585782fce08b1e6e756526f713c1faa81a11/paramList.txt"
+    - name: "list2"
+      type: "urlList"
+      definition: "https://gist.githubusercontent.com/AlexGue/8600403bdd2b4309980040ffa681a262/raw/dd80585782fce08b1e6e756526f713c1faa81a11/paramList.txt"
+configuration:
+  limits:
+    parallelExecutions: 10
+    virtualUserExecutions: 10
+    requestPerSecond: 10
+running: true

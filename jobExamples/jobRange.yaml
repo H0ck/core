@@ -1,0 +1,18 @@
+id: "UUID"
+title: "Job 1"
+code: "code"
+parametrization:
+  parameters:
+    - name: "list1"
+      type: "list"
+      definition: "apikey1, user2, user3, user4, user5, user6"
+    - name: "list2"
+      type: "ranges"
+      definition: 
+        - '0-1000'
+configuration:
+  limits:
+    parallelExecutions: 6000
+    virtualUserExecutions: 10
+    requestPerSecond: 10
+running: true

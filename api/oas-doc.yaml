@@ -1,0 +1,243 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Job list
+  description: >-
+    This is an OpenAPI Specification created by oas-wizard
+    (https://github.com/pafmon/oas-wizard)  
+  contact:
+    name: PabloFM
+    email: pablofm@us.es
+    url: 'http://www.isa.us.es'
+  license:
+    name: MIT
+    url: 'http://opensource.org/licenses/MIT'
+paths:
+  /api/v1/jobs/resumed:
+    get:
+      description: Returns all jobs resumed
+      x-router-controller: apiv1jobsController
+      operationId: getJobsResumed
+      responses:
+        '200':
+          description: Job List
+          content:
+            application/json:
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorModel'
+  /api/v1/jobs:
+    get:
+      description: Returns all jobs
+      operationId: getJobs
+      responses:
+        '200':
+          description: Job List
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/job'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorModel'
+    post:
+      description: Creates a new job
+      operationId: addJob
+      responses:
+        '201':
+          description: job created
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorModel'
+      requestBody:
+        x-name: job
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/job'
+        description: Job to be created
+        required: true
+  '/api/v1/jobs/{id}/results':
+    get:
+      description: Returns a job by id
+      operationId: findJobResultByid
+      x-router-controller: apiv1jobsidController
+      parameters:
+        - name: id
+          in: path
+          description: id of job to fetch
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorModel'
+  '/api/v1/jobs/{id}':
+    get:
+      description: Returns a job by id
+      operationId: findJobByid
+      parameters:
+        - name: id
+          in: path
+          description: id of job to fetch
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorModel'
+    delete:
+      description: deletes a single job based on the id
+      operationId: deleteJob
+      parameters:
+        - name: id
+          in: path
+          description: ID of job to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: job deleted
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorModel'
+    put:
+      description: Update a job based on its id
+      operationId: updateJob
+      parameters:
+        - name: id
+          in: path
+          description: ID of job to put
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: job updated
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorModel'
+      requestBody:
+        x-name: job
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/job'
+        description: Job to be updated
+        required: true
+components:
+  schemas:
+    errorModel:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    job:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        code:
+          type: string
+          minLength: 1
+        parametrization:
+          type: object
+          properties:
+            parameters:
+              type: array
+              uniqueItems: true
+              minItems: 1
+              items:
+                required:
+                  - name
+                  - type
+                  - definition
+                properties:
+                  name:
+                    type: string
+                    minLength: 1
+                  type:
+                    type: string
+                    minLength: 1
+                  definition:
+                    type: string
+                    minLength: 1
+          required:
+            - parameters
+        configuration:
+          type: object
+          properties:
+            limits:
+              type: object
+              properties:
+                parallelExecutions:
+                  type: number
+                virtualUserExecutions:
+                  type: number
+                requestPerSecond:
+                  type: number
+              required:
+                - parallelExecutions
+                - virtualUserExecutions
+                - requestPerSecond
+          required:
+            - limits
+        running:
+          type: boolean
+      required:
+        - id
+        - title
+        - code
+        - parametrization
+        - configuration
+        - running

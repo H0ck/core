@@ -1,0 +1,32 @@
+id: "UUID"
+title: "Job 1"
+code: "module.exports.main = async function(params){ \n return 'Hello World!:' + JSON.stringify(params) \n } "
+parametrizationGroups:
+  - parametrization:
+      parameters:
+        - name: "list1"
+          type: "list"
+          definition: "user1, user2"
+        - name: "list2"
+          type: "urlList"
+          definition: "https://gist.githubusercontent.com/AlexGue/8600403bdd2b4309980040ffa681a262/raw/dd80585782fce08b1e6e756526f713c1faa81a11/paramList.txt"
+        - name: "list3"
+          type: "list"
+          definition: "prueba1, prueba2, prueba3, prueba4"
+  - parametrization:
+      parameters:
+        - name: "list1"
+          type: "list"
+          definition: "user1, user2"
+        - name: "list2"
+          type: "urlList"
+          definition: "https://gist.githubusercontent.com/AlexGue/8600403bdd2b4309980040ffa681a262/raw/dd80585782fce08b1e6e756526f713c1faa81a11/paramList.txt"
+        - name: "index"
+          type: "range"
+          definition: "1-50"
+configuration:
+  limits:
+    parallelExecutions: 10
+    virtualUserExecutions: 10
+    requestPerSecond: 10
+running: true
