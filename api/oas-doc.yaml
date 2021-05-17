@@ -54,6 +54,8 @@ paths:
       description: Creates a new job
       operationId: addJob
       responses:
+        '200':
+          description: job created
         '201':
           description: job created
         default:
@@ -191,27 +193,30 @@ components:
           type: string
           minLength: 1
         parametrization:
-          type: object
-          properties:
-            parameters:
-              type: array
-              uniqueItems: true
-              minItems: 1
-              items:
-                required:
-                  - name
-                  - type
-                  - definition
-                properties:
-                  name:
-                    type: string
-                    minLength: 1
-                  type:
-                    type: string
-                    minLength: 1
-                  definition:
-                    type: string
-                    minLength: 1
+          type: array
+          minItems: 1
+          items:
+            required:
+              - parameters
+            properties:
+              parameters:
+                type: array
+                minItems: 1
+                items:
+                  required:
+                    - name
+                    - type
+                    - definition
+                  properties:
+                    name:
+                      type: string
+                      minLength: 1
+                    type:
+                      type: string
+                      minLength: 1
+                    definition:
+                      type: string
+                      minLength: 1
           required:
             - parameters
         configuration:
@@ -221,11 +226,17 @@ components:
               type: object
               properties:
                 parallelExecutions:
-                  type: number
+                  oneOf:
+                    - type: string
+                    - type: integer
                 virtualUserExecutions:
-                  type: number
+                  oneOf:
+                    - type: string
+                    - type: integer
                 requestPerSecond:
-                  type: number
+                  oneOf:
+                    - type: string
+                    - type: integer
               required:
                 - parallelExecutions
                 - virtualUserExecutions
@@ -235,9 +246,7 @@ components:
         running:
           type: boolean
       required:
-        - id
         - title
         - code
-        - parametrization
+        - parametrizationGroups
         - configuration
-        - running

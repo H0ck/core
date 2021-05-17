@@ -8,12 +8,13 @@ module.exports.getJobs = function getJobs(req, res, next) {
   res.send(AppManager.getJobs());
 };
 
-module.exports.getJobsResumed = function getJobs(req, res, next) {
+module.exports.getJobsResumed = async function getJobs(req, res, next) {
   let jobs = AppManager.getJobs();
-  let resumes = {}
-  AppManager.getJobs().forEach(job => {
-    resumes[job.id] = AppManager.getResultResumed(job.id);
-  })
+  let resumes = {};
+  await Promise.all(AppManager.getJobs().map(async(job) => {
+    resumes[job.id] = await AppManager.getResultResumed(job.id);
+  }))
+
   res.send({jobs: jobs, resumes: resumes});
 };
 

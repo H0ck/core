@@ -1,22 +1,22 @@
 let Jobs = [];
-let JobsResults = {};
 
-const ioredis = require('ioredis');
+const Redis = require("ioredis");
+const redis = new Redis();
 
 function getJobs() {
     return Jobs;
 }
+
 function addJob(job) {
     job.getTaskCount();
     Jobs.push(job);
     job.start()
 }
 
-
-
-function getResultResumed(jobId) {
+async function getResultResumed(jobId) {
     let resume = { fields: {} }
-    JobsResults[jobId]?.forEach(result => {
+    let results = await getResults(jobId);
+    results?.forEach(result => {
         if(!result) { return;}
         Object.keys(result).forEach(resultKey => {
             let resultValueString = JSON.stringify(result[resultKey]);
@@ -45,16 +45,19 @@ function getResultResumed(jobId) {
     return resume;
 }
 
-function getResults(jobId) {
-    return JobsResults[jobId];
+async function getResults(jobId) {
+   return (await getResultsPlain(jobId)).map(JSON.parse);
+}
+
+async function getResultsPlain(jobId) {
+   return await redis.lrange("results_" + jobId, 0, -1);
+
 }
 
 function pushResult(jobId, result) {
-    if (!JobsResults[jobId]){
-        JobsResults[jobId] = [];
-    }
-    console.log("PUSHING:", result)
-    JobsResults[jobId].push(result);
+    console.log(JSON.stringify(result))
+    return redis.lpush("results_" + jobId, JSON.stringify(result)).catch(err=>{
+    });
 }
 
 function processJobs() {
