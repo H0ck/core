@@ -30,6 +30,7 @@
     "js-yaml": "^3.14.1",
     "oas-tools": "^2.1.4",
     "redis": "^3.1.2",
+    "require-from-string": "^2.0.2",
     "uuid": "^8.3.2"
   }
 }

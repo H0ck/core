@@ -51,7 +51,6 @@ async function getResults(jobId) {
 
 async function getResultsPlain(jobId) {
    return await redis.lrange("results_" + jobId, 0, -1);
-
 }
 
 function pushResult(jobId, result) {
