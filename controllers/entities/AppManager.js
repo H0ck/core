@@ -1,6 +1,7 @@
 let Jobs = [];
 let JobsResults = {};
 
+const ioredis = require('ioredis');
 
 function getJobs() {
     return Jobs;
@@ -11,9 +12,12 @@ function addJob(job) {
     job.start()
 }
 
+
+
 function getResultResumed(jobId) {
     let resume = { fields: {} }
     JobsResults[jobId]?.forEach(result => {
+        if(!result) { return;}
         Object.keys(result).forEach(resultKey => {
             let resultValueString = JSON.stringify(result[resultKey]);
             if (!resume.fields[resultKey]) {

@@ -1,13 +1,13 @@
-const lambdasAvailables = 100;
 const AWS = require('aws-sdk');
 AWS.config.region = 'eu-west-3';
 var lambdaExecutor = new AWS.Lambda();
 
 
-function Task({ index, code, params, lambdaId }) {
-  this.index = index,
+function Task({ index, code, params, lambdaId, framework }) {
+    this.index = index,
     this.code = code,
     this.params = params,
+    this.framework = framework
     this.lambdaId = lambdaId
 }
 
@@ -20,13 +20,14 @@ Task.prototype.execute = function () {
       config: { params: this.params },
     }
     let params = {
-      FunctionName: 'h0ck-lambda-' + this.lambdaId,
+      FunctionName: this.framework + '-lambda-' + this.lambdaId,
       InvocationType: 'RequestResponse',
       LogType: 'Tail',
       Payload: JSON.stringify(payload),
     }
 
       invokes++;
+      console.log("INVOKING WITH ID:" , this.lambdaId)
     lambdaExecutor.invoke(params, function (err, data) {
       if (err) {
         console.error(err);

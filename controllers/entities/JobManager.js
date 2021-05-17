@@ -6,14 +6,14 @@ const h0ckApp = require('./AppManager');
 const { exception } = require('console');
 const { v4: uuidv4 } = require('uuid');
 const AppManager = require('./AppManager')
+const LambdaManager = require('./LambdaManager');
 
-let lambdasAvailables = 5;
 
-
-function Job({ id, title, code, parametrizationGroups, configuration, running, status }) {
+function Job({ id, title, framework, code, parametrizationGroups, configuration, running, status }) {
     this.id = id || uuidv4(),
         this.title = title,
-        this.code = code,
+        this.framework = framework,
+    this.code = code,
         this.parametrizationGroups = parametrizationGroups.map(group => new Parametrization({ parameters: group.parameters })),
         this.configuration = new JobConfiguration(configuration),
         this.running = running || false,
@@ -44,7 +44,7 @@ Job.prototype.getTaskCount = async function () {
 }
 
 Job.prototype.getNextLambda = function () {
-    if (this.lastLambda == 0 || this.lastLambda >= lambdasAvailables) {
+    if (this.lastLambda == 0 || this.lastLambda >= LambdaManager.getLambdaAvailability(this.framework)) {
         this.lastLambda = 1;
     } else {
         this.lastLambda++;
@@ -104,15 +104,15 @@ Job.prototype.getTask = async function (index) {
             paramMap.push(remainder); // Push the remainder of the final division to the list (This is the index for the first parameter)
             paramMap.reverse(); //Reverse to original position
 
-            let task = new TaskManager.Task({ index: index, code: this.code, params: {}, lambdaId: this.getNextLambda() }); //FIXME: If this method is accesed from outside the
+            let task = new TaskManager.Task({ index: index, code: this.code, params: {}, framework: this.framework,lambdaId: this.getNextLambda() }); //FIXME: If this method is accesed from outside the
             // executeTask, lambda id will be increased without executing task
             await Promise.all(group.parameters.map(async (param, index) => {
                 let rawParamList = await param.getRawParameterList();
-              //  console.log("RAW PARAMS", rawParamList)
-             //   console.log("GETTING PARAM", param.name, "index", index, "paramMap", paramMap);
+                //  console.log("RAW PARAMS", rawParamList)
+                //   console.log("GETTING PARAM", param.name, "index", index, "paramMap", paramMap);
                 task.params[param.name] = rawParamList[paramMap[index]];
             }))
-          //  console.log("FOUND ", index, task.params)
+            //  console.log("FOUND ", index, task.params)
             return task;
         }
     }
@@ -131,7 +131,7 @@ Job.prototype.stop = function () {
 
 Job.prototype.validate = async function () {
     let jobTaskCount = await this.getTaskCount();
-    this.configuration.taskGroupSize = Math.floor((jobTaskCount / lambdasAvailables) / this.configuration.limits.virtualUserExecutions) + 1;
+    this.configuration.taskGroupSize = Math.floor((jobTaskCount / LambdaManager.getLambdaAvailability(this.framework)) / this.configuration.limits.virtualUserExecutions) + 1;
     if (this.configuration.taskGroupSize > this.configuration.limits.parallelExecutions) {
         throw Error('This job is not currently supported. Too much functions to execute.');
     }
