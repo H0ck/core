@@ -1,6 +1,6 @@
 'use strict'
 
-const AppManager = require('./entities/AppManager')
+const AppManager = require('../src/entities/AppManager')
 module.exports.findJobByid = function findJobByid(req, res, next) {
   res.send({
     message: 'This is the mockup controller for findJobByid'

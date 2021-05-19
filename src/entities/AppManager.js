@@ -1,0 +1,51 @@
+let Jobs = [];
+
+const Redis = require("ioredis");
+const redis = new Redis();
+
+function getJobs() {
+    return Jobs;
+}
+
+function addJob(job) {
+    job.getTaskCount();
+    Jobs.push(job);
+    job.start()
+}
+
+
+
+function processJobs() {
+    console.log("Processing jobs");
+
+    Jobs.filter(isRunning).filter(hasMoreTasks).forEach(job => {
+        let limits = job.configuration.limits;
+        let executionAllowance = limits.parallelExecutions - job.status.currentExecutions;
+        let numberOfTaskToProcess = (executionAllowance < limits.requestPerSecond) ? executionAllowance : limits.requestPerSecond;
+        processNewTasks(job, numberOfTaskToProcess);
+    })
+}
+
+function isRunning(job) {
+    return job.running;
+}
+
+function hasMoreTasks(job){
+    return job.hasMoreTasks();
+}
+
+function processNewTasks(job, count) {
+    for (var i = 0; i < count; i++) {
+        if (job.hasMoreTasks()) {
+            job.executeNextTask();
+        }
+    }
+}
+
+function startJobProcessor() {
+    setInterval(processJobs, 1000);
+};
+
+module.exports.getJobs = getJobs;
+module.exports.addJob = addJob;
+module.exports.startJobProcessor = startJobProcessor;

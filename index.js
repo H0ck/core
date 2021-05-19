@@ -8,7 +8,9 @@ var express = require("express");
 var app = express();
 const cors = require('cors');
 var bodyParser = require('body-parser');
-const AppManager = require('./controllers/entities/AppManager')
+const AppManager = require('./src/entities/AppManager')
+const resultProcessorsUtils = require('./src/resultProcessorUtils');
+
 app.use(bodyParser.json({
   strict: false
 }));
@@ -20,6 +22,13 @@ var serverPort = 10000;
 var spec = fs.readFileSync(path.join(__dirname, '/api/oas-doc.yaml'), 'utf8');
 var oasDoc = jsyaml.safeLoad(spec);
 
+
+
+const Redis = require("ioredis");
+const redis = new Redis();
+//TODO: Remove redis cleanup
+redis.flushdb();
+
 var options_object = {
   controllers: path.join(__dirname, './controllers'),
   loglevel: 'info',
@@ -28,6 +37,8 @@ var options_object = {
   validator: true
 };
 
+
+resultProcessorsUtils.storeDefaultResultProcessors();
 oasTools.configure(options_object);
 
 oasTools.initialize(oasDoc, app, function() {

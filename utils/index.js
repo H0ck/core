@@ -5,7 +5,7 @@ async function runScript(scriptText, config) {
     let scriptResponse;
     try {
         const module = requireFromString(scriptText);
-        scriptResponse = await module.main(config.result, config.params);
+        scriptResponse = await module.main(config.results, config.params);
     } catch (error) {
         scriptResponse = 'Error running code: ' + error;
         throw Error(scriptResponse);

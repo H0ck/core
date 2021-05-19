@@ -13,24 +13,6 @@ info:
     name: MIT
     url: 'http://opensource.org/licenses/MIT'
 paths:
-  /api/v1/jobs/resumed:
-    get:
-      description: Returns all jobs resumed
-      x-router-controller: apiv1jobsController
-      operationId: getJobsResumed
-      responses:
-        '200':
-          description: Job List
-          content:
-            application/json:
-              schema:
-                type: object
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorModel'
   /api/v1/jobs:
     get:
       description: Returns all jobs
@@ -97,6 +79,129 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/errorModel'
+  '/api/v1/jobs/{jobId}/resultProcessors':
+    get:
+      description: Returns a job by id
+      operationId: getJobResultProcessors
+      x-router-controller: resultProcessorController
+      parameters:
+        - name: jobId
+          in: path
+          description: id of job to fetch
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/any'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorModel'
+    post:
+      description: Creates a new result processor
+      operationId: addJobResultProcessor
+      x-router-controller: resultProcessorController
+      parameters:
+        - name: jobId
+          in: path
+          description: id of job to add Result processor
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: job created
+        '201':
+          description: job created
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorModel'
+      requestBody:
+        x-name: resultProcessor
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/any'
+        description: Result processor to be created
+        required: true
+  '/api/v1/jobs/{jobId}/resultProcessors/{name}':
+    get:
+      description: Returns a job result processor by name
+      operationId: findJobResultProcessorByName
+      x-router-controller: resultProcessorController
+      parameters:
+        - name: jobId
+          in: path
+          description: id of job to fetch
+          required: true
+          schema:
+            type: string
+        - name: name
+          in: path
+          description: name of the result processor 
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job Result processor returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/any'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorModel'
+  '/api/v1/jobs/{jobId}/resultProcessors/{name}/process':
+    post:
+      description: Executes a result processor
+      operationId: processResultProcessor
+      x-router-controller: resultProcessorController
+      parameters:
+        - name: jobId
+          in: path
+          description: id of job to add Result processor
+          required: true
+          schema:
+            type: string
+        - name: name
+          in: path
+          description: name of the result processor
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: job created
+        '201':
+          description: job created
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorModel'
+      requestBody:
+        x-name: params
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/any'
+        description: Params for the processor
+        required: false
   '/api/v1/jobs/{id}':
     get:
       description: Returns a job by id
@@ -169,6 +274,8 @@ paths:
         required: true
 components:
   schemas:
+    any:
+      type: object
     errorModel:
       type: object
       required:

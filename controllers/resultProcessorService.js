@@ -1,20 +1,46 @@
 'use strict'
 
-const AppManager = require('./entities/AppManager')
-const Redis = require("ioredis");
-const redis = new Redis();
-module.exports.getResultProcessorsByJob = function getResultProcessorsByJob(req, res, next) {
+
+const resultProcessorStorage = require('../src/db/resultProcessorStorage');
+const resultStorage = require('../src/db/resultStorage');
+
+module.exports.getJobResultProcessors = async function getJobResultProcessors(req, res, next) {
+    res.send(await resultProcessorStorage.getResultProcessorsByJobId(req.jobId.value));
 };
 
-module.exports.findResultProcessorById = function findResultProcessorById(req, res, next) {
+module.exports.addJobResultProcessor = async function addJobResultProcessor(req, res, next) {
+    let resultProcessor = await resultProcessorStorage.addResultProcessor(req.resultProcessor.value);
+    if (resultProcessor.id){
+        let pushResult = await resultProcessorStorage.pushResultProcessorIdToJob(resultProcessor.id);
+        res.send(pushResult);
+    }else {
+        res.status(400).send("Error creating the result processor");
+    }
 };
 
 
-module.exports.processResultProcessorById = function processResultProcessorById(req, res, next) {
+module.exports.findJobResultProcessorByName = async function findJobResultProcessorByName(req, res, next) {
+    res.send(await resultProcessorStorage.getResultProcessorByJobIdAndResultProcessorName(req.jobId.value, req.name.value));
 };
 
-module.exports.deleteResultProcessor = function deleteResultProcessor(req, res, next) {
+
+module.exports.processResultProcessor = async function processResultProcessor(req, res, next) {
+    let resultProcessor = await resultProcessorStorage.getResultProcessorByJobIdAndResultProcessorName(req.jobId.value, req.name.value);
+    if (!resultProcessor) {
+        resultProcessor = await resultProcessorStorage.getDefaultResultProcessorByName(req.name.value);
+    }
+    if (!resultProcessor){
+        res.status(404).send("ResultProcessor not found")
+    } else {
+        let jobResults = await resultStorage.getResultsByJobId(req.jobId.value);
+        res.send(await resultProcessor.process(jobResults, req.params.value));
+    }
+  
 };
 
-module.exports.updateResultProcessor = function updateResultProcessor(req, res, next) {
+module.exports.deleteJobResultProcessor = async function deleteJobResultProcessor(req, res, next) {
+    res.send(await resultProcessorStorage.removeResultProcessorByJobIdAndResultProcessorName(req.jobId.value, req.name.value));
+};
+
+module.exports.updateResultProcessor = async function updateResultProcessor(req, res, next) {
 };

@@ -1,11 +1,12 @@
 const yaml = require('js-yaml');
 const fs = require('fs');
 const axios = require('axios');
-const TaskManager = require('../entities/TaskManager');
+const TaskManager = require('./TaskManager');
 const h0ckApp = require('./AppManager');
 const { exception } = require('console');
 const { v4: uuidv4 } = require('uuid');
-const AppManager = require('./AppManager')
+const AppManager = require('./AppManager');
+const resultStorage = require('../db/resultStorage');
 const LambdaManager = require('./LambdaManager');
 
 
@@ -76,7 +77,7 @@ Job.prototype.executeNextTask = async function () {
         result = await this.executeTask(taskIndex).catch(err => {
             console.error("Error when executing task (", taskIndex, ") :", err)
         });
-        AppManager.pushResult(this.id, result);
+        resultStorage.pushResultToJob(this.id, result);
     } catch (err) {
         result.error = err;
         console.error(err)
