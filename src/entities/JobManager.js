@@ -10,17 +10,18 @@ const resultStorage = require('../db/resultStorage');
 const LambdaManager = require('./LambdaManager');
 
 
-function Job({ id, title, framework, code, parametrizationGroups, configuration, running, status }) {
-    this.id = id || uuidv4(),
-        this.title = title,
-        this.framework = framework,
-    this.code = code,
-        this.parametrizationGroups = parametrizationGroups.map(group => new Parametrization({ parameters: group.parameters })),
-        this.configuration = new JobConfiguration(configuration),
-        this.running = running || false,
-        this.status = new JobStatus(status || { currentIndex: 0, currentExecutions: 0 });
+function Job({ id, title, framework, code, parametrizationGroups, configuration, running, status, resultProcessors }) {
+    this.id = id || uuidv4();
+    this.title = title;
+    this.framework = framework;
+    this.code = code;
+    this.parametrizationGroups = parametrizationGroups.map(group => new Parametrization({ parameters: group.parameters }));
+    this.configuration = new JobConfiguration(configuration);
+    this.running = running || false;
+    this.status = new JobStatus(status || { currentIndex: 0, currentExecutions: 0 });
     this.taskCount = 0;
     this.lastLambda = 0;
+    this.resultProcessors = resultProcessors; //TODO: Make resultProcessors consistent between resultProcessor of redis  & this job
 
 };
 
@@ -105,7 +106,7 @@ Job.prototype.getTask = async function (index) {
             paramMap.push(remainder); // Push the remainder of the final division to the list (This is the index for the first parameter)
             paramMap.reverse(); //Reverse to original position
 
-            let task = new TaskManager.Task({ index: index, code: this.code, params: {}, framework: this.framework,lambdaId: this.getNextLambda() }); //FIXME: If this method is accesed from outside the
+            let task = new TaskManager.Task({ index: index, code: this.code, params: {}, framework: this.framework, lambdaId: this.getNextLambda() }); //FIXME: If this method is accesed from outside the
             // executeTask, lambda id will be increased without executing task
             await Promise.all(group.parameters.map(async (param, index) => {
                 let rawParamList = await param.getRawParameterList();

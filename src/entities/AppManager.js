@@ -1,15 +1,19 @@
 let Jobs = [];
 
-const Redis = require("ioredis");
-const redis = new Redis();
+const resultProcessorStorage = require('../db/resultProcessorStorage');
+
 
 function getJobs() {
     return Jobs;
 }
 
-function addJob(job) {
+async function addJob(job) {
     job.getTaskCount();
     Jobs.push(job);
+    job.resultProcessors?.forEach(async (processor)=>{
+        let added = await resultProcessorStorage.addResultProcessor(processor);
+        await resultProcessorStorage.pushResultProcessorIdToJob(job.id, added.id);
+    })
     job.start()
 }
 

@@ -25,7 +25,7 @@ function getResultProcessorsIdListByJobId(jobId){
 
 
 async function pushResultProcessorIdToJob(jobId, resultProcessorId) {
-    if ((await getResultProcessorsIdListByJobId(jobId)).includes(id)) {
+    if ((await getResultProcessorsIdListByJobId(jobId)).includes(resultProcessorId)) {
         return "Already exists"
     } else {
         return redis.lpush("job_" + jobId + "_resultProcessors", resultProcessorId);
