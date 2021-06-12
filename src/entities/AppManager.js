@@ -47,7 +47,7 @@ function processNewTasks(job, count) {
 }
 
 function startJobProcessor() {
-    setInterval(processJobs, 1000);
+    setInterval(processJobs, 5000);
 };
 
 module.exports.getJobs = getJobs;

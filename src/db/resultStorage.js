@@ -1,5 +1,7 @@
 const Redis = require("ioredis");
-const redis = new Redis();
+const redisPort = process.env.REDIS_PORT || 6379;
+const redisHost = process.env.REDIS_HOST || "localhost";
+const redis = new Redis(redisPort, redisHost);
 
 
 function pushResultToJob(jobId, result) {

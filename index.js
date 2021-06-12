@@ -5,6 +5,7 @@ var fs = require('fs'),
     path = require('path');
 
 var express = require("express");
+require('dotenv').config()
 var app = express();
 const cors = require('cors');
 var bodyParser = require('body-parser');
@@ -17,16 +18,16 @@ app.use(bodyParser.json({
 app.use(cors());
 var oasTools = require('oas-tools');
 var jsyaml = require('js-yaml');
-var serverPort = 10000;
+var serverPort = process.env.PORT || 7001;
 
 var spec = fs.readFileSync(path.join(__dirname, '/api/oas-doc.yaml'), 'utf8');
 var oasDoc = jsyaml.safeLoad(spec);
 
 
-
 const Redis = require("ioredis");
-const redis = new Redis();
-//TODO: Remove redis cleanup
+const redisPort = process.env.REDIS_PORT || 6379;
+const redisHost = process.env.REDIS_HOST || "localhost";
+const redis = new Redis(redisPort, redisHost);
 redis.flushdb();
 
 var options_object = {

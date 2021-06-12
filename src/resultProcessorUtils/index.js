@@ -1,5 +1,4 @@
-const ioredis = require('ioredis');
-const redis = new ioredis();
+
 const fs = require('fs');
 const path = require('path');
 const resultProcessorStorage = require('../db/resultProcessorStorage');
