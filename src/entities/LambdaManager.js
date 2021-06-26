@@ -1,6 +1,3 @@
- const AWS = require('aws-sdk');
- AWS.config.region = 'eu-west-3';
- var lambdaExecutor = new AWS.Lambda();
 
  //TODO: Retrieve availability dinamically
  let lambdaAvailabilityMap = {
