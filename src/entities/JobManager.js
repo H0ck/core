@@ -22,7 +22,6 @@ function Job({ id, title, framework, code, parametrizationGroups, configuration,
     this.taskCount = 0;
     this.lastLambda = 0;
     this.resultProcessors = resultProcessors; //TODO: Make resultProcessors consistent between resultProcessor of redis  & this job
-
 };
 
 
@@ -88,7 +87,6 @@ Job.prototype.executeNextTask = async function () {
 }
 
 Job.prototype.getTask = async function (index) {
-    //console.log("GETTING TASK", index)
     let currentGroupMax = 0;
     for (let group of this.parametrizationGroups) {
         let indexInGroup = index - currentGroupMax;
@@ -110,15 +108,11 @@ Job.prototype.getTask = async function (index) {
             // executeTask, lambda id will be increased without executing task
             await Promise.all(group.parameters.map(async (param, index) => {
                 let rawParamList = await param.getRawParameterList();
-                //  console.log("RAW PARAMS", rawParamList)
-                //   console.log("GETTING PARAM", param.name, "index", index, "paramMap", paramMap);
                 task.params[param.name] = rawParamList[paramMap[index]];
             }))
-            //  console.log("FOUND ", index, task.params)
             return task;
         }
     }
-
 }
 
 Job.prototype.start = function () {
